@@ -39,6 +39,9 @@ export class MuJoCoDemo {
     document.body.appendChild( this.container );
 
     this.scene = new THREE.Scene();
+
+    // Setup GUI with salute button
+    this.setupGUI();
     this.scene.name = 'scene';
 
     this.camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.001, 100 );
