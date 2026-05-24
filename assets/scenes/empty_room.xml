@@ -1,0 +1,35 @@
+<mujoco model="empty-room">
+  <compiler angle="radian" coordinate="local"/>
+  <option timestep="0.002" gravity="0 0 -9.81"/>
+
+  <visual>
+    <rgba haze="0.15 0.25 0.35 1"/>
+    <global offwidth="2560" offheight="1440" elevation="-20" azimuth="120"/>
+  </visual>
+
+  <asset>
+    <texture type="skybox" builtin="gradient" rgb1=".3 .5 .7" rgb2="0 0 0" width="32" height="512"/>
+    <texture type="2d" name="grid" builtin="checker" width="512" height="512"
+             rgb1=".2 .2 .2" rgb2=".3 .3 .3"/>
+    <material name="grid" texture="grid" texrepeat="8 8" reflectance=".1"/>
+  </asset>
+
+  <worldbody>
+    <light diffuse=".8 .8 .8" pos="0 0 5" dir="0 0 -1" castshadow="true"/>
+    <light diffuse=".4 .4 .4" pos="2 2 4" dir="-1 -1 -2"/>
+
+    <!-- Ground plane -->
+    <geom type="plane" size="10 10 0.1" material="grid"/>
+
+    <!-- Example: drop a box to verify physics works -->
+    <body name="sample_box" pos="0 0 1">
+      <freejoint/>
+      <geom type="box" size=".1 .1 .1" rgba=".9 .3 .1 1" mass="1"/>
+    </body>
+
+  </worldbody>
+
+  <actuator>
+    <!-- Add actuators here -->
+  </actuator>
+</mujoco>

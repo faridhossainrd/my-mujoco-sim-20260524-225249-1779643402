@@ -1,0 +1,18 @@
+{
+  "sessionId": "sess_l4910n2e",
+  "fullHistory": [
+    {
+      "role": "user",
+      "content": "make a salute acitvity for this unitreeG1 robot"
+    }
+  ],
+  "agentHistory": [
+    {
+      "role": "user",
+      "content": "make a salute acitvity for this unitreeG1 robot"
+    }
+  ],
+  "compressionCount": 0,
+  "workspaceRoot": "/home/farid/mojoco/robacreatorhub_server2/roba/roba-laravel/repos/faridhossainrd/my-mujoco-sim-20260524-225249-1779643402",
+  "savedAt": 1779644325587
+}

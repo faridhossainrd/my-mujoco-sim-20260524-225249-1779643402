@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>ROBA MuJoCo Simulator</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <meta name="application-name"   content="ROBA MuJoCo Simulator">
+        <meta name="description"        content="ROBA MuJoCo Simulator - Advanced physics simulation platform for robotics development and testing">
+        <meta name="keywords"           content="ROBA, MuJoCo, Robotics, Physics Simulation, WebAssembly">
+        <meta name="author"             content="ROBA">
+        <meta name="viewport"           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover, user-scalable=no, shrink-to-fit=0">
+        <meta name="theme-color"        content="#0D0D0D">
+        <link rel ="icon" type="image/png" href="./assets/favicon.png">
+        <style>
+            /* Custom lil-gui styling with collapsible sidebar */
+            .lil-gui {
+                --background-color: #0D0D0D !important;
+                --widget-color: rgba(255, 255, 255, 0.03) !important;
+                --focus-color: rgba(245, 245, 245, 0.6) !important;
+                --hover-color: rgba(255, 255, 255, 0.05) !important;
+                --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
+                --font-size: 11px !important;
+                --text-color: rgba(255, 255, 255, 0.6) !important;
+                --title-background-color: transparent !important;
+                --title-text-color: whitesmoke !important;
+                --border-color: rgba(255, 255, 255, 0.05) !important;
+                --number-color: whitesmoke !important;
+                --string-color: whitesmoke !important;
+                box-shadow: none !important;
+                border-left: 1px solid rgba(255, 255, 255, 0.05) !important;
+                transition: width 0.3s ease !important;
+            }
+
+            .lil-gui.root {
+                width: 320px !important;
+                right: 0 !important;
+                top: 0 !important;
+                border-radius: 0 !important;
+                padding-top: 60px !important;
+            }
+
+            .lil-gui.root.collapsed {
+                width: 120px !important;
+            }
+
+            .lil-gui.root.collapsed .children {
+                display: none !important;
+            }
+
+            .lil-gui.root.collapsed .controller {
+                display: none !important;
+            }
+
+            .lil-gui.root.collapsed .title {
+                display: none !important;
+            }
+
+            /* Custom header with favicon and collapse button */
+            .gui-custom-header {
+                position: fixed !important;
+                top: 0 !important;
+                right: 0 !important;
+                width: 320px !important;
+                height: 60px !important;
+                background: #0D0D0D !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+                border-left: 1px solid rgba(255, 255, 255, 0.05) !important;
+                z-index: 10000 !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                gap: 12px !important;
+                transition: width 0.3s ease !important;
+            }
+
+            .gui-custom-header.collapsed {
+                width: 120px !important;
+                justify-content: center !important;
+                gap: 8px !important;
+            }
+
+            /* Favicon in header - always visible */
+            .gui-header-favicon {
+                width: 32px !important;
+                height: 32px !important;
+                background: url('./assets/favicon.png') no-repeat center center !important;
+                background-size: 32px 32px !important;
+                flex-shrink: 0 !important;
+            }
+
+            /* Collapse/Expand button in header */
+            .gui-header-toggle {
+                width: 24px !important;
+                height: 24px !important;
+                background: rgba(255, 255, 255, 0.1) !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                border-radius: 4px !important;
+                cursor: pointer !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                transition: all 0.2s !important;
+                flex-shrink: 0 !important;
+            }
+
+            .gui-header-toggle:hover {
+                background: rgba(255, 255, 255, 0.15) !important;
+            }
+
+            .gui-header-toggle::after {
+                content: '‹' !important;
+                color: whitesmoke !important;
+                font-size: 18px !important;
+                font-weight: bold !important;
+                transition: transform 0.3s !important;
+            }
+
+            .gui-custom-header.collapsed .gui-header-toggle::after {
+                transform: rotate(180deg) !important;
+            }
+
+            .lil-gui .title {
+                background-color: transparent !important;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+                color: whitesmoke !important;
+                font-weight: 500 !important;
+                font-size: 13px !important;
+                padding: 12px 16px !important;
+            }
+
+            .lil-gui .controller {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
+                padding: 8px 16px !important;
+            }
+
+            .lil-gui .controller .name {
+                color: rgba(255, 255, 255, 0.6) !important;
+                font-size: 11px !important;
+            }
+
+            .lil-gui input[type="range"] {
+                accent-color: whitesmoke !important;
+                height: 8px !important;
+                border-radius: 4px !important;
+            }
+
+            .lil-gui input[type="range"]::-webkit-slider-track {
+                background: rgba(255, 255, 255, 0.1) !important;
+                border-radius: 4px !important;
+                height: 8px !important;
+            }
+
+            .lil-gui input[type="range"]::-webkit-slider-thumb {
+                background-color: whitesmoke !important;
+                width: 16px !important;
+                height: 16px !important;
+                border-radius: 50% !important;
+                cursor: pointer !important;
+            }
+
+            .lil-gui input[type="range"]::-moz-range-track {
+                background: rgba(255, 255, 255, 0.1) !important;
+                border-radius: 4px !important;
+                height: 8px !important;
+            }
+
+            .lil-gui input[type="range"]::-moz-range-thumb {
+                background-color: whitesmoke !important;
+                width: 16px !important;
+                height: 16px !important;
+                border-radius: 50% !important;
+                border: none !important;
+                cursor: pointer !important;
+            }
+
+            .lil-gui .controller.function {
+                padding: 4px 16px !important;
+            }
+
+            .lil-gui .controller.function .name {
+                display: none !important;
+            }
+
+            .lil-gui .controller.function .widget {
+                width: 100% !important;
+            }
+
+            .lil-gui button {
+                background-color: rgba(255, 255, 255, 0.1) !important;
+                color: rgba(255, 255, 255, 0.9) !important;
+                border: 1px solid rgba(255, 255, 255, 0.2) !important;
+                border-radius: 6px !important;
+                padding: 6px 12px !important;
+                font-size: 11px !important;
+                font-weight: 500 !important;
+                transition: all 0.2s !important;
+                cursor: pointer !important;
+                width: 100% !important;
+                text-align: center !important;
+            }
+
+            .lil-gui button:hover {
+                background-color: rgba(255, 255, 255, 0.15) !important;
+                border-color: rgba(255, 255, 255, 0.3) !important;
+            }
+
+            .lil-gui select {
+                background-color: rgba(255, 255, 255, 0.05) !important;
+                color: rgba(255, 255, 255, 0.9) !important;
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                border-radius: 6px !important;
+                padding: 6px 8px !important;
+                font-size: 11px !important;
+                cursor: pointer !important;
+            }
+
+            .lil-gui input {
+                background-color: rgba(255, 255, 255, 0.05) !important;
+                color: rgba(255, 255, 255, 0.9) !important;
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                border-radius: 6px !important;
+                padding: 6px 8px !important;
+                font-size: 11px !important;
+            }
+
+            .lil-gui .controller.number input {
+                color: whitesmoke !important;
+            }
+
+            .lil-gui .controller.boolean label {
+                cursor: pointer !important;
+            }
+        </style>
+    </head>
+
+    <body style="margin:0px; background-color:rgb(0, 0, 0); overflow:hidden; position:fixed; min-height: 100%;
+                 touch-action: none;
+                 -webkit-touch-callout: none; /* iOS Safari */
+                 -webkit-user-select: none; /* Safari */
+                 -khtml-user-select: none; /* Konqueror HTML */
+                 -moz-user-select: none; /* Old versions of Firefox */
+                 -ms-user-select: none; /* Internet Explorer/Edge */
+                 user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */">
+        <h1 hidden></h1> <!-- Puts the Lighthouse Score over 90 heheh-->
+
+		<!-- Import maps polyfill -->
+		<script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+
+        <!-- Allows three.js Examples to work without building -->
+        <script type="importmap">
+            { "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/"} }
+        </script>
+
+        <!-- Custom GUI header with favicon and toggle -->
+        <div class="gui-custom-header collapsed">
+            <div class="gui-header-favicon"></div>
+            <div class="gui-header-toggle" onclick="toggleGUI()"></div>
+        </div>
+
+        <script>
+            // GUI collapse/expand functionality - collapsed by default
+            function toggleGUI() {
+                const gui = document.querySelector('.lil-gui.root');
+                const header = document.querySelector('.gui-custom-header');
+                if (gui && header) {
+                    gui.classList.toggle('collapsed');
+                    header.classList.toggle('collapsed');
+                }
+            }
+
+            // Set collapsed state on load
+            window.addEventListener('DOMContentLoaded', () => {
+                setTimeout(() => {
+                    const gui = document.querySelector('.lil-gui.root');
+                    const header = document.querySelector('.gui-custom-header');
+                    if (gui && header) {
+                        gui.classList.add('collapsed');
+                        header.classList.add('collapsed');
+                    }
+                }, 100); // Small delay to ensure GUI is initialized
+            });
+        </script>
+
+        <div id="appbody" style="position: absolute;">
+            <!--<div id="error"></div>
+            <script type="module" src="./src/Debug.js"></script>-->
+            <script type="module" src="./src/main.js"></script>
+        </div>
+    </body>
+</html>
